@@ -1119,11 +1119,12 @@ class MonarchMoney(object):
 
     async def set_budget_amount(
         self,
-        category_id: str,
+        category_id: str, 
         amount: float,
         timeframe: str = "month",  # I believe this is the only valid value right now
         start_date: Optional[str] = None,
         apply_to_future: bool = False,
+        is_group: bool = False,
     ) -> Dict[str, Any]:
         """
         Updates the budget amount for the given category.
@@ -1141,6 +1142,8 @@ class MonarchMoney(object):
             beginning of today's month will be used.
         :param apply_to_future:
             Whether to apply the new budget amount to all proceeding timeframes
+        :param is_group:
+            Set true to treat category_id as category group id. 
         """
         query = gql(
             """
@@ -1173,6 +1176,10 @@ class MonarchMoney(object):
             variables["input"]["startDate"] = datetime(
                 current_year, current_month, 1
             ).strftime("%Y-%m-%d")
+        if is_group:
+            del variables["input"]["categoryId"]
+            variables["input"]["categoryGroupId"] = category_id
+             
 
         return await self.gql_call(
             operation="Common_UpdateBudgetItem",
