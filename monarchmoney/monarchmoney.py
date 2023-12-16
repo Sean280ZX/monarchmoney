@@ -1125,6 +1125,7 @@ class MonarchMoney(object):
         timeframe: str = "month",  # I believe this is the only valid value right now
         start_date: Optional[str] = None,
         apply_to_future: bool = False,
+        is_group: bool = False,
     ) -> Dict[str, Any]:
         """
         Updates the budget amount for the given category.
@@ -1184,6 +1185,10 @@ class MonarchMoney(object):
             variables["input"]["startDate"] = datetime(
                 current_year, current_month, 1
             ).strftime("%Y-%m-%d")
+        if is_group:
+            del variables["input"]["categoryId"]
+            variables["input"]["categoryGroupId"] = category_id
+             
 
         return await self.gql_call(
             operation="Common_UpdateBudgetItem",
